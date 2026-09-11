@@ -270,6 +270,12 @@ This project is still under development. Some improvements I plan to explore inc
 
 ---
 
+## 📄 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
 ## ⚠️ Disclaimer
 
 This project was created for **personal and educational purposes**.

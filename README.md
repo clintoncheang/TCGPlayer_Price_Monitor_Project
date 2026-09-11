@@ -1,6 +1,5 @@
 # TCGPlayer_Price_Monitor_Project
 
-# TCGplayer Dynamic Price Monitor
 
 A Python-based price monitoring tool built in Jupyter Notebook that tracks selected products on TCGplayer and sends Discord notifications when a listing falls below a dynamically calculated target price.
 

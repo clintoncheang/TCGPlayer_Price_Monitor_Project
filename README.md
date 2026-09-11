@@ -1,65 +1,72 @@
-# TCGPlayer_Price_Monitor_Project
+# 🎴 TCGPlayer_Price_Monitor_Project
 
 
-A Python-based price monitoring tool built in Jupyter Notebook that tracks selected products on TCGplayer and sends Discord notifications when a listing falls below a dynamically calculated target price.
+A Python-based price monitoring tool built in **Jupyter Notebook** that tracks selected products on TCGplayer and sends **Discord notifications** when a listing falls below a dynamically calculated target price.
 
-Instead of using a fixed threshold, the monitor retrieves the current **TCGplayer Market Price** and calculates the target as a percentage of that value. By default, an alert is triggered when the lowest available listing, including shipping, falls below **70% of the current Market Price**.
+Instead of using a fixed price threshold, the monitor retrieves the current **TCGplayer Market Price** and calculates the target as a percentage of that value. By default, an alert is triggered when the lowest available listing, including shipping, falls below **70% of the current Market Price**.
 
-## Features
+> **Project Status:** 🚧 This is an ongoing personal project and will continue to be improved as I experiment with new features and monitoring strategies. For true 24/7 monitoring, the program needs to run on a device or environment that stays online, such as a cloud server, Raspberry Pi, or an older laptop dedicated to running the monitor.
 
-* Monitors multiple TCGplayer products
+---
+
+## 💡 Why I Built This
+
+Trading card prices can change quickly, and manually checking the same cards throughout the day is not exactly an efficient use of time.
+
+I built this project to automate that process. Rather than simply looking for cards below a fixed dollar amount, the monitor compares current listings against the card's **Market Price**, allowing the alert threshold to adjust as the market changes.
+
+It also gave me an opportunity to work with **web automation, asynchronous Python, data extraction, regular expressions, and webhook-based notifications** in a practical project.
+
+---
+
+## ✨ Features
+
+* Tracks multiple TCGplayer products
 * Retrieves the current TCGplayer Market Price
-* Dynamically calculates a target price based on market value
-* Analyzes current marketplace listings
-* Includes shipping in the total price calculation
-* Uses Playwright to handle dynamically rendered content
-* Captures product images for alerts
-* Sends Discord notifications when the target price is reached
-* Displays price, shipping, seller, condition, and market information
-* Automatically repeats checks at a configurable interval
-* Includes fallback methods for Market Price extraction
+* Calculates a dynamic target based on Market Price
+* Evaluates current marketplace listings
+* Includes shipping when calculating total cost
+* Identifies the lowest available total price
+* Uses Playwright to handle dynamically rendered web content
+* Sends Discord webhook notifications
+* Includes product information and images in alerts
+* Supports both one-time and continuous monitoring
+* Includes fallback extraction methods if webpage structure changes
 
-## How It Works
+---
 
-For each configured product, the notebook:
+## ⚙️ How It Works
+
+For each tracked product, the monitor:
 
 1. Opens the TCGplayer product page using Playwright.
-2. Waits for dynamically rendered marketplace data.
-3. Extracts the current TCGplayer Market Price.
-4. Calculates the target price:
+2. Waits for marketplace listings and pricing information to load.
+3. Extracts the current **TCG Market Price**.
+4. Calculates a dynamic target price:
 
 ```text
 Target Price = Market Price × 70%
 ```
 
-5. Analyzes the available marketplace listings.
-6. Calculates the total cost:
+5. Examines the available marketplace listings.
+6. Calculates the total cost of each listing:
 
 ```text
 Total Cost = Listing Price + Shipping
 ```
 
 7. Identifies the lowest total cost.
-8. Sends a Discord alert when:
+8. Sends a Discord notification when:
 
 ```text
 Lowest Total Cost < Target Price
 ```
 
-The monitor then waits for the configured interval before checking all tracked products again.
-
-## Example
-
-If the current Market Price is:
+For example, if the Market Price is **$30.00**:
 
 ```text
-$30.00
-```
-
-the 70% dynamic target is:
-
-```text
-$30.00 × 0.70 = $21.00
+Dynamic Target = $30.00 × 70%
+               = $21.00
 ```
 
 If a listing is available for:
@@ -67,28 +74,27 @@ If a listing is available for:
 ```text
 Card Price: $18.50
 Shipping:    $1.25
-Total:       $19.75
+------------------
+Total:      $19.75
 ```
 
-the monitor detects:
+Since `$19.75 < $21.00`, the monitor triggers a Discord alert.
 
-```text
-$19.75 < $21.00
-```
+---
 
-and sends an alert to Discord.
+## 🛠️ Technologies
 
-## Technologies
+* **Python**
+* **Jupyter Notebook**
+* **Playwright**
+* **Asyncio**
+* **Requests**
+* **Regular Expressions (Regex)**
+* **Discord Webhooks**
 
-* Python
-* Jupyter Notebook
-* Playwright
-* Asyncio
-* Requests
-* Regular Expressions (Regex)
-* Discord Webhooks
+---
 
-## Installation
+## 📦 Installation
 
 Clone the repository:
 
@@ -97,7 +103,7 @@ git clone <your-repository-url>
 cd <your-repository-name>
 ```
 
-Install the dependencies:
+Install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -115,23 +121,33 @@ Start Jupyter Notebook:
 jupyter notebook
 ```
 
-Open:
+Then open the project's `.ipynb` file.
 
-```text
-TCGplayer_Price_Monitor.ipynb
+---
+
+## 🔐 Discord Webhook Setup
+
+For security, the Discord webhook URL is **not stored directly in the notebook**.
+
+Set your Discord webhook as an environment variable before running the monitor:
+
+```bash
+export DISCORD_WEBHOOK_URL="your_discord_webhook_url"
 ```
 
-and run the notebook cells.
-
-Because the project runs in Jupyter, the asynchronous monitoring loop is started with:
+The notebook retrieves it with:
 
 ```python
-await main_loop()
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 ```
 
-## Configuration
+> **Important:** Never commit your actual Discord webhook URL, API keys, tokens, or other credentials to a public repository.
 
-Products can be added to `TRACKED_PRODUCTS`:
+---
+
+## 🎯 Configuration
+
+Products can be added or removed from the configuration:
 
 ```python
 TRACKED_PRODUCTS = [
@@ -142,56 +158,70 @@ TRACKED_PRODUCTS = [
     {
         "product_id": 707586,
         "name": "Sayla Mass EX Resource"
+    },
+    {
+        "product_id": 707585,
+        "name": "Miorine EX Resource"
     }
 ]
 ```
 
-The monitoring interval and alert threshold can also be adjusted:
+The alert percentage and monitoring interval can also be changed:
 
 ```python
-CHECK_INTERVAL_SECONDS = 300
 DYNAMIC_PERCENTAGE = 0.70
+CHECK_INTERVAL_SECONDS = 300
 ```
 
-The default configuration checks prices every five minutes and alerts when the lowest total listing price falls below 70% of the current Market Price.
+The default configuration checks every **5 minutes** and alerts when a listing falls below **70% of Market Price**.
 
-## Discord Webhook Setup
+---
 
-For security, the Discord webhook URL should **not** be stored directly in the notebook.
+## ▶️ Running the Monitor
 
-Store it as an environment variable:
+### Run Once
 
-```bash
-export DISCORD_WEBHOOK_URL="your_webhook_url"
-```
-
-Then retrieve it in the notebook:
+For testing or demonstration:
 
 ```python
-DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
+await run_once()
 ```
 
-Never commit your actual Discord webhook URL to a public GitHub repository.
+This checks every configured product once and then stops.
 
-## Discord Alert
+### Continuous Monitoring
 
-When the target threshold is reached, the notification includes:
+For continuous monitoring:
+
+```python
+await main_loop()
+```
+
+The monitor will check all configured products, wait for the configured interval, and repeat until stopped.
+
+---
+
+## 🔔 Discord Alerts
+
+When the target price is triggered, the Discord notification can include:
 
 * Product name
 * Lowest total cost
 * Dynamic target price
-* TCGplayer Market Price
+* TCG Market Price
 * Base listing price
 * Shipping cost
 * Card condition
 * Seller information
 * Product image
-* Direct link to the TCGplayer product page
+* Link to the TCGplayer product page
 
-## Repository Structure
+---
+
+## 📁 Repository Structure
 
 ```text
-tcgplayer-price-monitor/
+TCGplayer-Price-Monitor/
 │
 ├── TCGplayer_Price_Monitor.ipynb
 ├── README.md
@@ -199,22 +229,51 @@ tcgplayer-price-monitor/
 └── .gitignore
 ```
 
-## Disclaimer
+### `requirements.txt`
 
-This project was developed for personal and educational purposes. It is not affiliated with, endorsed by, or sponsored by TCGplayer or Discord.
+```text
+playwright
+requests
+jupyter
+```
 
-Website structure and dynamically rendered content may change over time and may require updates to the scraping logic. Users are responsible for ensuring their use complies with applicable website terms and policies.
+### `.gitignore`
 
-## Future Improvements
+```text
+.env
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+card_art_*.png
+.DS_Store
+venv/
+.venv/
+env/
+```
 
-Future development could include:
+---
 
-* Duplicate-alert prevention
+## 🚀 Future Improvements
+
+This project is still under development. Some improvements I plan to explore include:
+
+* Duplicate-alert prevention and alert cooldowns
 * Historical price tracking
 * Price trend visualization
-* Configurable card-condition filters
-* Seller-rating filters
-* Persistent price storage
-* Additional error handling
-* Automated cloud deployment
-* Expanded support for additional products
+* Seller rating filters
+* Card condition filters
+* Persistent storage for historical listings
+* Better handling of changes to TCGplayer's webpage structure
+* Additional error handling and logging
+* Cloud or Raspberry Pi deployment for 24/7 monitoring
+* Support for additional products and configurable alert thresholds
+
+---
+
+## ⚠️ Disclaimer
+
+This project was created for **personal and educational purposes**.
+
+It is not affiliated with, endorsed by, or sponsored by TCGplayer or Discord. TCGplayer's website structure may change over time, which may require updates to the data extraction logic.
+
+Users are responsible for ensuring that their use of this project complies with applicable website terms, policies, and rate limits.
